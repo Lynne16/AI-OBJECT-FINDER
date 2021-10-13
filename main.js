@@ -1,5 +1,6 @@
-status="";
+status1="";
 objects=[];
+input1="";
 function preload(){
 }
 
@@ -13,26 +14,34 @@ video.hide();
 function draw(){
     image(video,0,0,450,400);
 
-    if(status != ""){
+    if(status1 != ""){
+        document.getElementById("status").innerHTML="Status: Objects Detected";
+        objectDetector.detect(video,gotResults);
 
         for(var i=0; i < objects.length; i++){
-            fill('skyblue');
+            fill('blue');
             percent =floor(objects[i].confidence  * 100);
             text(objects[i].label+" "+percent+"%",objects[i].x,objects[i].y);
             noFill();
-            stroke('skyblue');
+            stroke('blue');
             rect(objects[i].x,objects[i].y,objects[i].width,objects[i].height);
+            synth=window.speechSynthesis;
 
-            if(objects[i].label == input){
+            if(objects[i].label == input1){
                 video.stop();
                 objectDetector.detect(gotResults);
-                document.getElementById("info"),innerHTML="Status: "+input+" found";
-                synth=window.speechSynthesis;
-                var utterThis=new SpeechSynthesisUtterance(input+" found")
+                document.getElementById("info"),innerHTML=input1+" found";
+               // synth=window.speechSynthesis;
+                var utterThis=new SpeechSynthesisUtterance(input1+" found")
                 synth.speak(utterThis);
+                utterThis.cancel();
             }
             else{
-                document.getElementById("info").innerHTML=input+" not found";
+                video.play();
+                document.getElementById("info").innerHTML=input1+" not found";
+                var utterThis=new SpeechSynthesisUtterance(input1+" not found")
+                synth.speak(utterThis);
+                utterThis.cancel();
             }
         }
     }
@@ -42,15 +51,15 @@ function draw(){
 function start(){
     objectDetector=ml5.objectDetector('cocossd',modelLoaded);
     document.getElementById("status").innerHTML="Status: Detecting Objects";
-    input=document.getElementById("input").value;
+    input1=document.getElementById("input").value;
 }
 
 function modelLoaded(){
     console.log('Model Loaded!!!');
-    status=true;
+    status1=true;
 }
 
-function gotResults(){
+function gotResults(error,results){
     if(error){
     console.error(error)
     }
